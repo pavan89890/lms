@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+<body>
+	<!-- /.row -->
+	<div th:fragment="userPopup" id="page_content">
+		<form role="form" action="/lms/admin/saveLeaveType" method="post"
+			id="leaveTypeFormId">
+			<input type="hidden" name="id" th:value="${leaveType.id}">
+			<div class="box-body">
+				<div class="form-group">
+					<label for="leaveType">Leave Type</label> <input name="leaveType"
+						class="form-control" id="leaveType" placeholder="Enter Leave Type"
+						th:value="${leaveType.leaveType}" type="text">
+				</div>
+			</div>
+			<!-- /.box-body -->
+		</form>
+	</div>
+</body>
+</html>

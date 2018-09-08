@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{decorator}">
+<head>
+<!-- DataTables -->
+<link rel="stylesheet"
+	th:href="@{/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css}">
+</head>
+<body>
+	<!-- /.row -->
+	<div layout:fragment="page_content" id="page_content">
+		<section class="content-header">
+			<h1>
+				Leaves <small>(Requested,Rejected,Approved,Cancelled)</small>
+			</h1>
+		</section>
+
+		<!-- Main content -->
+		<section class="content container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="box box-success">
+
+						<div class="box-header with-border">
+							Leaves
+							<div class="col-md-3 pull-right">
+								<select class="form-control"
+									onchange="getLeavesByStatus(this.value)">
+									<option value="">Select Leave Status</option>
+									<option value="REQUESTED">Requested</option>
+									<option value="REJECTED">Rejected</option>
+									<option value="APPROVED">Approved</option>
+									<option value="CANCELLED">Cancelled</option>
+								</select>
+							</div>
+						</div>
+						<div class="box-body">
+							<div class="table-responsive" id="leaveReportInnerDivId">
+								<div th:replace="/leaveReportInner:: leaveReportInner"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<!-- DataTables -->
+		<script
+			th:src="@{/bower_components/datatables.net/js/jquery.dataTables.min.js}"></script>
+		<script
+			th:src="@{/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js}"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('#example2').DataTable();
+			});
+			function getLeavesByStatus(status) {
+				if (status != "") {
+					$.ajax({
+						url : '/lms/user/leaveReportInner?status=' + status,
+						type : 'get',
+						success : function(data) {
+							$("#leaveReportInnerDivId").html(data);
+						},
+						error : function() {
+							alert("Unable to load details.");
+						}
+					});
+				}
+			}
+		</script>
+	</th:block>
+</body>
+</html>

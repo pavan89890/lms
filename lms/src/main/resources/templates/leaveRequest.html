@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{decorator}">
+<head>
+<link rel="stylesheet"
+	th:href="@{/bower_components/bootstrap-datepicker/dist/css/bootstrap-datepicker.min.css}">
+</head>
+<body>
+	<!-- /.row -->
+	<div layout:fragment="page_content" id="page_content">
+		<section class="content-header">
+			<h1>
+				Leave Request <small>(Apply Leave)</small>
+			</h1>
+		</section>
+
+		<!-- Main content -->
+		<section class="content container-fluid">
+			<div class="row">
+				<div class="col-md-6">
+					<div class="box box-success">
+						<div class="box-body">
+							<form role="form" action="/lms/user/saveLeaveRequest" method="post"
+								id="leaveRequestFormId">
+								<div class="box-body">
+									<div class="form-group">
+										<label for="leaveType">Leave Type</label><select
+											class="form-control" id="leaveType" name="leaveType">
+											<option value="">Select Leave Type</option>
+											<th:block th:each="leaveType:${leaveTypes}">
+												<option th:value="${leaveType.id}"
+													th:text="${leaveType.leaveType}"></option>
+											</th:block>
+										</select>
+									</div>
+									<div class="form-group">
+										<label>From Date:</label>
+										<div class="input-group date">
+											<div class="input-group-addon">
+												<i class="fa fa-calendar"></i>
+											</div>
+											<input type="text" name="fromDate"
+												class="form-control pull-right" id="fromDate">
+										</div>
+									</div>
+									<div class="form-group">
+										<label>To Date:</label>
+
+										<div class="input-group date">
+											<div class="input-group-addon">
+												<i class="fa fa-calendar"></i>
+											</div>
+											<input type="text" name="toDate"
+												class="form-control pull-right" id="toDate">
+										</div>
+									</div>
+									<div class="form-group">
+										<label for="reason">Reason</label><input type="text"
+											name="reason" class="form-control pull-right" id="reason"
+											placeholder="Enter Reason">
+									</div>
+								</div>
+								<!-- /.box-body -->
+								<div class="box-footer">
+									<button type="button" class="btn btn-success"
+										onclick="verify()">Request Leave</button>
+								</div>
+							</form>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<!-- bootstrap datepicker -->
+		<script
+			th:src="@{/bower_components/bootstrap-datepicker/dist/js/bootstrap-datepicker.min.js}"></script>
+		<script type="text/javascript">
+			$('#fromDate,#toDate').datepicker({
+				format : "dd-mm-yyyy",
+				autoclose : true,
+				todayHighlight : true,
+				startDate : '+0d'
+			})
+
+			function verify() {
+				if ($("#leaveType").val().trim() == "") {
+					alert("Please Select Leave Type");
+					$("#leaveType").focus();
+					return false;
+				} else if ($("#fromDate").val().trim() == "") {
+					alert("Please Select From Date");
+					$("#fromDate").focus();
+					return false;
+				} else if ($("#toDate").val().trim() == "") {
+					alert("Please Select To Date");
+					$("#toDate").focus();
+					return false;
+				} else if ($("#reason").val().trim() == "") {
+					alert("Please Enter Reason");
+					$("#reason").focus();
+					return false;
+				} else {
+					$.ajax({
+						url : $("#leaveRequestFormId").attr("action"),
+						type : 'post',
+						data : $("#leaveRequestFormId").serialize(),
+						success : function(data) {
+							if (data.split("-")[0] == "SUCCESS") {
+								alert(data.split("-")[1]);
+								$("#leaveRequestFormId")[0].reset();
+								window.location.reload();
+							} else {
+								alert(data.split("-")[1], "error");
+							}
+
+						},
+						error : function() {
+							alert("Unable to load details.");
+						}
+					});
+					return true;
+				}
+			}
+		</script>
+	</th:block>
+</body>
+</html>

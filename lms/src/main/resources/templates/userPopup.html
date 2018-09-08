@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+</head>
+<body>
+	<!-- /.row -->
+	<div th:fragment="userPopup" id="page_content">
+		<form role="form" action="/lms/admin/saveUser" method="post"
+			id="userFormId">
+			<input type="hidden" name="id" th:value="${user.id}">
+			<div class="box-body">
+				<div class="form-group">
+					<label for="name">Name</label> <input name="name"
+						class="form-control" id="name" placeholder="Enter Name"
+						th:value="${user.name}" type="text">
+				</div>
+				<div class="form-group">
+					<label for="email">Email</label> <input class="form-control"
+						th:value="${user.email}" id="email" name="email"
+						placeholder="Enter Email" type="text">
+				</div>
+				<div class="form-group">
+					<label for="username">Username</label> <input class="form-control"
+						th:value="${user.username}" id="username" name="username"
+						placeholder="Enter Username" type="text">
+				</div>
+				<div class="form-group">
+					<label for="password">Password</label> <input class="form-control"
+						id="password" name="password" placeholder="Enter Password"
+						value="" type="password">
+				</div>
+				<div class="form-group">
+					<label for="roles">Role</label><select class="form-control"
+						id="roles" name="roles">
+						<option value="">Select Role</option>
+						<th:block th:each="role:${roles}">
+							<option th:value="${role.id}" th:text="${role.rolename}"
+								th:selected="(${role.id==(user.id==0?0:user.roles.get(0).id)})"></option>
+						</th:block>
+					</select>
+				</div>
+				<div class="form-group">
+					<label for="manager">Manager</label><select class="form-control"
+						id="manager" name="manager">
+						<option value="">Select Manager</option>
+						<th:block th:each="manager:${users}">
+							<option th:value="${manager.id}" th:text="${manager.name}"
+								th:selected="(${manager.id==(user.manager==null?0:user.manager.id)})"></option>
+						</th:block>
+					</select>
+				</div>
+			</div>
+			<!-- /.box-body -->
+		</form>
+	</div>
+</body>
+</html>

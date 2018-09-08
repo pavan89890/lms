@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{decorator}">
+<head>
+<!-- DataTables -->
+<link rel="stylesheet"
+	th:href="@{/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css}">
+</head>
+<body>
+	<!-- /.row -->
+	<div layout:fragment="page_content" id="page_content">
+		<section class="content-header">
+			<h1>
+				Users <small>(add,update,delete)</small>
+			</h1>
+		</section>
+
+		<!-- Main content -->
+		<section class="content container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="box box-success">
+						<div class="box-header with-border">
+							Users
+							<button class="btn btn-success btn-xs pull-right" id="addBtnId"
+								data-toggle="modal" data-target="#modal-default"
+								onclick="updateRecord(0);">Add</button>
+						</div>
+						<div class="box-body">
+							<div class="table-responsive">
+								<table id="example2" class="table table-bordered table-striped">
+									<thead>
+										<tr>
+											<th>S.No</th>
+											<th>Name</th>
+											<th>Email</th>
+											<th>Username</th>
+											<th>Password</th>
+											<th>Enabled</th>
+											<th>Roles</th>
+											<th>Manager</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="user,status:${users}">
+											<td th:text="${status.index+1}"></td>
+											<td th:text="${user.name}"></td>
+											<td th:text="${user.email}"></td>
+											<td th:text="${user.username}"></td>
+											<td th:text="${user.password}"></td>
+											<td th:text="${user.enabled}"></td>
+											<td><th:block th:each="role:${user.roles}">
+													<span th:text="${role.rolename}"></span>
+												</th:block></td>
+											<td th:text="${user.manager!=null?user.manager.name:''}"></td>
+											<td style="white-space: nowrap;"><button
+													class="btn btn-info btn-xs"
+													th:onclick="${'javascript:updateRecord('+user.id+')'}">
+													<i class="fa fa-edit"></i>
+												</button>
+												<button
+													th:onclick="${'javascript:deleteRecord('+user.id+')'}"
+													class="btn btn-danger btn-xs">
+													<i class="fa fa-trash"></i>
+												</button></td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<div class="modal fade" id="modal-default">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal"
+							aria-label="Close">
+							<span aria-hidden="true">&times;</span>
+						</button>
+						<h4 class="modal-title">Users</h4>
+					</div>
+					<div class="modal-body" id="modalBodyId">
+						<!-- <div th:replace="/userPopup:: userPopup"></div> -->
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-default pull-left"
+							data-dismiss="modal">Close</button>
+						<button type="button" class="btn btn-success" onclick="verify()">Save
+						</button>
+					</div>
+				</div>
+				<!-- /.modal-content -->
+			</div>
+			<!-- /.modal-dialog -->
+		</div>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<!-- DataTables -->
+		<script
+			th:src="@{/bower_components/datatables.net/js/jquery.dataTables.min.js}"></script>
+		<script
+			th:src="@{/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js}"></script>
+		<script type="text/javascript">
+			function verify() {
+				if ($("#name").val().trim() == "") {
+					alert("Please Enter Name");
+					$("#name").focus();
+					return false;
+				} else if ($("#email").val().trim() == "") {
+					alert("Please Enter Email");
+					$("#email").focus();
+					return false;
+				} else if ($("#username").val().trim() == "") {
+					alert("Please Enter Username");
+					$("#username").focus();
+					return false;
+				} else if ($("#password").val().trim() == "") {
+					alert("Please Enter Password");
+					$("#password").focus();
+					return false;
+				} else if ($("#roles").val().trim() == "") {
+					alert("Please Select Role");
+					$("#roles").focus();
+					return false;
+				} else if ($("#manager").val().trim() == "") {
+					alert("Please Select manager");
+					$("#manager").focus();
+					return false;
+				} else {
+					$.ajax({
+						url : $("#userFormId").attr("action"),
+						type : 'post',
+						data : $("#userFormId").serialize(),
+						success : function(data) {
+							if (data.split("-")[0] == "SUCCESS") {
+								alert(data.split("-")[1]);
+								$("#userFormId")[0].reset();
+								window.location.reload();
+							} else {
+								alert(data.split("-")[1], "error");
+							}
+
+						},
+						error : function() {
+							alert("Unable to load details.");
+						}
+					});
+					return true;
+				}
+			}
+
+			$(document).ready(function() {
+				$('#example2').DataTable();
+				$("#addBtnId").click(function() {
+					$("#userFormId")[0].reset();
+				});
+			});
+
+			function updateRecord(id) {
+				$.ajax({
+					url : '/lms/admin/updateUser?u=' + id,
+					type : 'get',
+					success : function(data) {
+						$("#modalBodyId").html(data);
+						$("#modal-default").modal(true);
+					},
+					error : function() {
+						alert("Unable to load details.");
+					}
+				});
+			}
+
+			function deleteRecord(id) {
+				if (confirm("Are you sure you want to delete?")) {
+					window.location = "/lms/admin/deleteUser?u=" + id;
+				}
+			}
+		</script>
+	</th:block>
+</body>
+</html>

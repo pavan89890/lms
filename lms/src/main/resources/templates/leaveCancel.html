@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+	xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+	layout:decorate="~{decorator}">
+<head>
+<!-- DataTables -->
+<link rel="stylesheet"
+	th:href="@{/bower_components/datatables.net-bs/css/dataTables.bootstrap.min.css}">
+</head>
+<body>
+	<!-- /.row -->
+	<div layout:fragment="page_content" id="page_content">
+		<section class="content-header">
+			<h1>
+				Leaves <small>(view,cancel leaves)</small>
+			</h1>
+		</section>
+
+		<!-- Main content -->
+		<section class="content container-fluid">
+			<div class="row">
+				<div class="col-md-12">
+					<div class="box box-success">
+						<div class="box-header with-border">Leaves</div>
+						<div class="box-body">
+							<div class="table-responsive">
+								<table id="example2" class="table table-bordered table-striped">
+									<thead>
+										<tr>
+											<th>S.No</th>
+											<th>Leave Type</th>
+											<th>From Date</th>
+											<th>To Date</th>
+											<th>Reason</th>
+											<th>Status</th>
+											<th></th>
+										</tr>
+									</thead>
+									<tbody>
+										<tr th:each="leave,status:${leaves}">
+											<td th:text="${status.index+1}"></td>
+											<td th:text="${leave.leaveType.leaveType}"></td>
+											<td th:text="${#dates.format(leave.fromDate,'dd-MM-yyyy')}"></td>
+											<td th:text="${#dates.format(leave.toDate,'dd-MM-yyyy')}"></td>
+											<td th:text="${leave.reason}"></td>
+											<td th:if="${leave.status.equals('APPROVED')}"
+												th:text="${leave.status}"
+												style="color: #00a65a; font-weight: bold;"></td>
+											<td th:if="${leave.status.equals('REJECTED')}"
+												th:text="${leave.status}"
+												style="color: #dd4b39; font-weight: bold;"></td>
+											<td th:if="${leave.status.equals('CANCELLED')}"
+												th:text="${leave.status}"
+												style="color: #f39c12; font-weight: bold;"></td>
+											<td th:if="${leave.status.equals('REQUESTED')}"
+												th:text="${leave.status}"
+												style="color: #00c0ef; font-weight: bold;"></td>
+											<td style="white-space: nowrap;">
+												<button title="Cancel"
+													th:if="${leave.status.equals('REQUESTED')}"
+													th:onclick="${'javascript:cancelLeave('+leave.id+')'}"
+													class="btn btn-danger btn-xs">
+													<i class="fa fa-remove"></i>
+												</button>
+											</td>
+										</tr>
+									</tbody>
+								</table>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<th:block layout:fragment="scripts">
+		<!-- DataTables -->
+		<script
+			th:src="@{/bower_components/datatables.net/js/jquery.dataTables.min.js}"></script>
+		<script
+			th:src="@{/bower_components/datatables.net-bs/js/dataTables.bootstrap.min.js}"></script>
+		<script type="text/javascript">
+			$(document).ready(function() {
+				$('#example2').DataTable();
+			});
+
+			function cancelLeave(id) {
+				if (confirm("Are you sure you want to Cancel?")) {
+					window.location = "/lms/user/saveLeaveCancel?leave=" + id;
+				}
+			}
+		</script>
+	</th:block>
+</body>
+</html>
